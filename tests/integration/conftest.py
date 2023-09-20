@@ -27,6 +27,7 @@ warnings.simplefilter("default", category=ResourceWarning)
 HAS_WARNED_GITHUB = False
 
 DEFAULT_PRIVATE_PYPI_SERVER = os.environ.get("PIPENV_PYPI_SERVER", "http://localhost:8080/simple")
+DEFAULT_PRIVATE_PYPI_SERVER_SECURE = os.environ.get("PIPENV_PYPI_SECURE_SERVER", "https://localhost:8443/simple")
 
 
 def try_internet(url="http://httpbin.org/ip", timeout=1.5):
@@ -89,6 +90,7 @@ def check_for_mercurial():
 TESTS_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PYPI_VENDOR_DIR = os.path.join(TESTS_ROOT, 'pypi')
 WE_HAVE_HG = check_for_mercurial()
+SELF_SIGNED_CERT = os.path.abspath(os.path.join(TESTS_ROOT, 'test_artifacts', 'certs', 'mitmproxy-ca-cert.pem'))
 
 
 def pytest_runtest_setup(item):
@@ -330,7 +332,27 @@ def pipenv_instance_private_pypi(capfdbinary, monkeypatch):
         finally:
             os.umask(original_umask)
 
+@pytest.fixture()
+def pipenv_instance_private_pypi_secure(capfdbinary, monkeypatch):
+    with temp_environ(), monkeypatch.context() as m:
+        m.setattr(shutil, "rmtree", _rmtree_func)
+        original_umask = os.umask(0o007)
+        os.environ["PIPENV_NOSPIN"] = "1"
+        os.environ["CI"] = "1"
+        os.environ["PIPENV_DONT_USE_PYENV"] = "1"
+        warnings.simplefilter("ignore", category=ResourceWarning)
+        warnings.filterwarnings("ignore", category=ResourceWarning, message="unclosed.*<ssl.SSLSocket.*>")
+        try:
+            yield functools.partial(_PipenvInstance, capfd=capfdbinary, index_url=DEFAULT_PRIVATE_PYPI_SERVER_SECURE)
+        finally:
+            os.umask(original_umask)
+
 
 @pytest.fixture()
 def testsroot():
     return TESTS_ROOT
+
+
+@pytest.fixture()
+def cert_path():
+    return SELF_SIGNED_CERT
