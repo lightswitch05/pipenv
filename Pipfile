@@ -31,7 +31,7 @@ tomli = "*"
 pyyaml = "==6.0.1"
 build = "*"
 twine = "*"
-mitmproxy = "==10.0.*"
+mitmproxy = "==9.0.*"  # downgrade mitmproxy from 10.0.x to fix py3.9 install error on windows
 
 [packages]
 pytz = "*"
