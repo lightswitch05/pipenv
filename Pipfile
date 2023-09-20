@@ -29,6 +29,7 @@ pyyaml = "==6.0.1"
 build = "*"
 twine = "*"
 semver = "*"
+mitmproxy = "==9.0.*"  # Can be updated when dropping py 3.9
 
 [packages]
 pytz = "*"
