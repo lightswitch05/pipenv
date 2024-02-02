@@ -174,7 +174,7 @@ Tests are written in `pytest` style and can be run very simply:
  pytest
 ```
 
-However many tests depend on running a private pypi server on localhost:8080.
+However many tests depend on running a private pypi server on localhost:8080 and a SSL proxy on localhost:8443.
 This can be accomplished by using either the `run-tests.sh` or `run-tests.bat` scripts
 which will start the `pypiserver` process ahead of invoking pytest.
 
@@ -182,9 +182,11 @@ You may also manually perform this step and then invoke pytest as you would norm
 
     # Linux or MacOS
     pipenv run pypi-server run -v --host=0.0.0.0 --port=8080 --hash-algo=sha256 --disable-fallback ./tests/pypi/ ./tests/fixtures &
+    pipenv run mitmdump -p 8443 --set confdir=./tests/test_artifacts/certs --mode reverse:http://127.0.0.1:8080 &
 
     # Windows
     cmd /c start pipenv run pypi-server run -v --host=0.0.0.0 --port=8080 --hash-algo=sha256 --disable-fallback ./tests/pypi/ ./tests/fixtures
+    cmd /c start pipenv run mitmdump -p 8443 --set confdir=./tests/test_artifacts/certs --mode reverse:http://127.0.0.1:8080
 
 This will run all Pipenv tests, which can take awhile. To run a subset of the
 tests, the standard pytest filters are available, such as:

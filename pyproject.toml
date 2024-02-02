@@ -220,6 +220,8 @@ markers = [
   "extras",
   "extended",
   "ext: extra non-categorized tests",
+  "ssl: ssl_verify and other cert-related tests",
+  "needs_mitmproxy: integration tests that require mitmproxy to pass"
 ]
 
 [tool.coverage.run]

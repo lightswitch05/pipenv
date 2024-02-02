@@ -51,10 +51,14 @@ echo "$ git submodule sync && git submodule update --init --recursive"
 
 git submodule sync && git submodule update --init --recursive
 
-echo "pipenv run pypi-server run -v --host=0.0.0.0 --port=8080 --hash-algo=sha256 --disable-fallback ./tests/pypi/ ./tests/fixtures &"
+echo "$ pipenv run pypi-server run -v --host=0.0.0.0 --port=8080 --hash-algo=sha256 --disable-fallback ./tests/pypi/ ./tests/fixtures &"
 
 pipenv run pypi-server run -v --host=0.0.0.0 --port=8080 --hash-algo=sha256 --disable-fallback ./tests/pypi/ ./tests/fixtures &
 
-echo "$pipenv run pytest -v -ra -n auto --cov-config pyproject.toml --fulltrace tests"
+echo "$ pipenv run mitmdump -p 8443 --set confdir=./tests/test_artifacts/certs --mode reverse:http://127.0.0.1:8080"
+
+pipenv run mitmdump -p 8443 --set confdir=./tests/test_artifacts/certs --mode reverse:http://127.0.0.1:8080
+
+echo "$ pipenv run pytest -v -ra -n auto --cov-config pyproject.toml --fulltrace tests"
 
 PIPENV_PYTHON=${PIPENV_PYTHON} ${PYTHON} -m pipenv run pytest -v -ra -n auto --cov-config pyproject.toml --fulltrace tests
