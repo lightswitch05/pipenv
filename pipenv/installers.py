@@ -24,7 +24,7 @@ class Version:
 
     @classmethod
     def parse(cls, name: str):
-        """Parse an X.Y.Z, X.Y, or pre-release version string into a version tuple."""
+        """Parse an X.Y.Z, X.Y, or pre-release version string into a version tuple. minor change"""
         match = re.match(r"^(\d+)\.(\d+)(?:\.(\d+))?(a|b|rc)?(\d+)?$", name)
         if not match:
             raise ValueError(f"invalid version name {name!r}")
