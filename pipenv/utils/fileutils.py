@@ -6,7 +6,7 @@ import sys
 import warnings
 from contextlib import contextmanager
 from pathlib import Path
-from tempfile import TemporaryDirectory
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 from typing import Any, Optional
 from urllib import parse as urllib_parse
 from urllib import request as urllib_request
@@ -192,6 +192,7 @@ def temp_path():
 
 
 TRACKED_TEMPORARY_DIRECTORIES = []
+TRACKED_TEMPORARY_FILES = []
 
 
 def create_tracked_tempdir(*args: Any, **kwargs: Any) -> str:
@@ -207,6 +208,21 @@ def create_tracked_tempdir(*args: Any, **kwargs: Any) -> str:
     atexit.register(tempdir.cleanup)
     warnings.simplefilter("ignore", ResourceWarning)
     return tempdir.name
+
+
+def create_tracked_tempfile(*args: Any, **kwargs: Any) -> "NamedTemporaryFile":
+    """Create a tracked temporary directory.
+
+    This uses `TemporaryDirectory`, but does not remove the directory
+    when the return value goes out of scope, instead registers a handler
+    to clean up on program exit. The return value is the path to the
+    created directory.
+    """
+    temp_file = NamedTemporaryFile(*args, **kwargs)
+    TRACKED_TEMPORARY_FILES.append(temp_file)
+    atexit.register(os.unlink, temp_file.name)
+    warnings.simplefilter("ignore", ResourceWarning)
+    return temp_file
 
 
 def check_for_unc_path(path):

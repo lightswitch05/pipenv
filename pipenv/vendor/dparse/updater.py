@@ -99,11 +99,10 @@ class PipfileUpdater(object):
             raise ImportError(
                 "Updating a Pipfile requires the pipenv extra to be installed."
                 " Install it with pip install dparse[pipenv]")
-        pipfile = tempfile.NamedTemporaryFile(delete=False)
-        p = Project(chdir=False)
-        p.write_toml(data=data, path=pipfile.name)
-        data = open(pipfile.name).read()
-        os.remove(pipfile.name)
+        with tempfile.NamedTemporaryFile() as pipfile:
+            p = Project(chdir=False)
+            p.write_toml(data=data, path=pipfile.name)
+            data = open(pipfile.name).read()
         return data
 
 

@@ -79,7 +79,6 @@ if this_python < min_version:
 
 import os.path
 import pkgutil
-import shutil
 import tempfile
 from base64 import b85decode
 
@@ -172,11 +171,8 @@ def bootstrap(tmpdir):
 
 
 def main():
-    tmpdir = None
-    try:
-        # Create a temporary working directory
-        tmpdir = tempfile.mkdtemp()
-
+    # Create a temporary working directory
+    with tempfile.TemporaryDirectory() as tmpdir:
         # Unpack the zipfile into the temporary directory
         pip_zip = os.path.join(tmpdir, "pip.zip")
         with open(pip_zip, "wb") as fp:
@@ -187,10 +183,6 @@ def main():
 
         # Run the bootstrap
         bootstrap(tmpdir=tmpdir)
-    finally:
-        # Clean up our temporary working directory
-        if tmpdir:
-            shutil.rmtree(tmpdir, ignore_errors=True)
 
 
 DATA = b"""

@@ -1,11 +1,14 @@
 import os
-import tempfile
 from pathlib import Path
 from typing import List, Optional
 
 from pipenv.patched.pip._internal.build_env import get_runnable_pip
 from pipenv.utils import err
-from pipenv.utils.fileutils import create_tracked_tempdir, normalize_path
+from pipenv.utils.fileutils import (
+    create_tracked_tempdir,
+    create_tracked_tempfile,
+    normalize_path,
+)
 from pipenv.utils.indexes import prepare_pip_source_args
 from pipenv.utils.processes import subprocess_run
 from pipenv.utils.shell import cmd_list_to_shell, project_python
@@ -31,10 +34,10 @@ def pip_install_deps(
     if not requirements_dir:
         requirements_dir = create_tracked_tempdir(prefix="pipenv", suffix="requirements")
 
-    standard_requirements = tempfile.NamedTemporaryFile(
+    standard_requirements = create_tracked_tempfile(
         prefix="pipenv-", suffix="-hashed-reqs.txt", dir=requirements_dir, delete=False
     )
-    editable_requirements = tempfile.NamedTemporaryFile(
+    editable_requirements = create_tracked_tempfile(
         prefix="pipenv-", suffix="-reqs.txt", dir=requirements_dir, delete=False
     )
 
